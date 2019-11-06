@@ -1,0 +1,172 @@
+<?php
+
+/**
+ * @file
+ * islandora_handled_datastream_access.module
+ *
+ *
+ *  Copyright 2019 Leiden University Library
+ *
+ *  This file is part of islandora_handled_datastream_access.
+ *
+ *  islandora_handled_datastream_access is free software: you can redistribute
+ *  it and/or modify it under the terms of the GNU General Public License as
+ *  published by the Free Software Foundation, either version 3 of the License,
+ *  or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_handled_datastream_access_menu() {
+  $items = array();
+  $items['islandora/handled_access/%/%/%/view'] = array(
+    'title' => 'View datastream via handle',
+    'page callback' => 'islandora_handled_datastream_access_view',
+    'page arguments' => array(2, 3, 4),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_access',
+    'access arguments' => array(2, 3, 4),
+  );
+  $items['islandora/handled_access/%/%/%/access'] = array(
+    'page callback' => 'islandora_handled_datastream_access_json_access',
+    'page arguments' => array(2, 3, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/accessapi.inc',
+  );
+
+  return $items;
+}
+
+function islandora_handled_datastream_access_view($handleprefix, $handlesuffix, $neededdatastream) {
+  module_load_include('inc', 'islandora', 'includes/datastream');
+
+  $object = _islandora_handled_datastream_access_object_load($handleprefix . '/' . $handlesuffix);
+  if ($object !== NULL) { 
+    $datastream = NULL;
+    $dsid = _islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
+    if ($dsid !== NULL && isset($object[$dsid])) {
+      if ($dsid === 'TN' && module_exists('islandora_imagecache') && module_load_include('inc', 'islandora_imagecache', 'includes/utilities')) {
+        $tnurl = islandora_imagecache_retrieve_image_cache_image($object); 
+        $defaultnurl = islandora_imagecache_retrieve_image_cache_image($object, 'X NO DS');
+        if ($tnurl !== NULL && tnurl !== $defaultnurl) {
+          $thumbnaildata = file_get_contents($tnurl);
+          header('Content-type: ' . $datastream->mimetype);
+          header('Content-length: ' . strlen($thumbnaildata));
+          $cache_check = islandora_view_datastream_cache_check($datastream);
+          if ($cache_check !== 200) {
+            if ($cache_check === 304) {
+              header('HTTP/1.1 304 Not Modified');
+            }
+            elseif ($cache_check === 412) {
+              header('HTTP/1.0 412 Precondition Failed');
+            }
+          }
+          islandora_view_datastream_set_cache_headers($datastream);
+
+          drupal_page_is_cacheable(FALSE);
+         
+          if ($cache_check === 200) {
+            print $thumbnaildata;
+          }
+          exit();
+        }
+      }
+      else {
+        $datastream = $object[$dsid];
+        if ($datastream !== NULL) {
+          islandora_view_datastream($datastream); 
+          exit();
+        }
+      }
+    }
+  }
+  exit();
+}
+
+function islandora_handled_datastream_access_view_access($handleprefix, $handlesuffix, $neededdatastream) {
+  $object = _islandora_handled_datastream_access_object_load($handleprefix . '/' . $handlesuffix);
+  if ($object !== NULL) {
+    $datastream = NULL;
+    $dsid = _islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
+    if ($dsid !== NULL && isset($object[$dsid])) {
+      $datastream = $object[$dsid];
+      if ($datastream !== NULL) {
+        return islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $datastream);
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Helper function to retrieve the Islandora object based on the handle.
+ *
+ * @param string $handle
+ *
+ * @return mixed
+ * The Islandora object associated with this handle or NULL.
+ */
+function _islandora_handled_datastream_access_object_load($handle) {
+  // Why is this functionality not available in the islandora_handle module?
+  module_load_include('inc', 'islandora_handle', 'includes/handle');
+  $object = NULL;
+  if (function_exists('islandora_handle_retrieve_selected_handler')) {
+    $handler_class = islandora_handle_retrieve_selected_handler();
+    $handler = new $handler_class();
+    $targeturl = $handler->readHandle($handle);
+    if ($targeturl) {
+      $urlparts = parse_url($targeturl); 
+      $posaliaspath = ltrim($urlparts['path'], '/');
+      $normalpath = drupal_get_normal_path(urldecode($posaliaspath));
+      $normalpath = ltrim($normalpath, '/');
+      $object = menu_get_object('islandora_object', 2, $normalpath);
+    }
+  }
+  return $object;
+}
+
+/**
+ * Helper function to determine the datastream id to use for an object.
+ *
+ * @param AbstractObject $object
+ * @param string $neededdatastream
+ *
+ * @return string
+ * The datastream id to use, or null if not found.
+ */
+function _islandora_handled_datastream_access_get_dsid(AbstractObject $object, $neededdatastream) {
+  $dsid = $neededdatastream;
+  if ($neededdatastream === 'image') {
+    $imagedatastreams = array(
+      'OBJ' => array('image/png', 'image/jpeg', 'image/jp2'),
+      'JP2' => array('image/jp2'),
+      'JPG' => array('image/jpeg'),
+      'MEDIUM_SIZE' => array('image/png', 'image/jpeg'),
+    );
+    foreach ($imagedatastreams as $adsid => $mimetypes) {
+      if (isset($object[$adsid])) {
+        $datastream = $object[$adsid];
+        if (isset($datastream) && in_array($datastream->mimetype, $mimetypes, TRUE)) {
+          if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $datastream)) {
+            $dsid = $adsid;
+            break;
+          }
+        }
+      }
+    }
+  }
+  return $dsid;
+}
+ 
