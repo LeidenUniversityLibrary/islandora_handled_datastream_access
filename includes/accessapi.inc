@@ -64,19 +64,23 @@ function islandora_handled_datastream_access_json_access($handleprefix, $handles
  * Helper function the determine the access of a specific thing.
  */
 function _islandora_handled_datastream_access_get_access($accessfunc, $op, $thing) {
+  $doimpersonate = FALSE;
   // Impersonate an anonymous user:
-  global $user;
-  $original_user = $user;
-  $old_state = drupal_save_session();
-  drupal_save_session(FALSE);
-  $user = drupal_anonymous_user();
-
+  if ($doimpersonate) {
+    global $user;
+    $original_user = $user;
+    $old_state = drupal_save_session();
+    drupal_save_session(FALSE);
+    $user = drupal_anonymous_user();
+  }
   // Check the access.
   $canaccess = call_user_func($accessfunc, $op, $thing, $user);
 
   // Stop impersonating...
-  $user = $original_user;
-  drupal_save_session($old_state);
+  if ($doimpersonate) {
+    $user = $original_user;
+    drupal_save_session($old_state);
+  }
 
   return $canaccess;
 }
