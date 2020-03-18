@@ -28,7 +28,7 @@ This module requires the following modules/libraries:
 This module uses the following modules/libraries if they are installed:
 
 * [Islandora image cache](https://github.com/discoverygarden/islandora_imagecache)
-* [curl](https://github.com/curl) (mandatory if islandora_imagecache is installed, but by default installed with islandora)
+* [curl](https://github.com/curl) (is used when islandora_imagecache is installed, but by default installed with islandora)
 
 ## Installation
  
