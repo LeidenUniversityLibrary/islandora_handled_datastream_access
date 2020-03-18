@@ -73,7 +73,7 @@ function islandora_handled_datastream_access_view($handleprefix, $handlesuffix, 
                 header('HTTP/1.1 304 Not Modified');
               }
               elseif ($cache_check === 412) {
-                header('HTTP/1.0 412 Precondition Failed');
+                header('HTTP/1.1 412 Precondition Failed');
               }
             }
             islandora_view_datastream_set_cache_headers($datastream);
