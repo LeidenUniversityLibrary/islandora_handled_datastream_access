@@ -1,5 +1,5 @@
 name = Islandora Handled Datastream Access
-description = Islandora handled datastream access allows view access to datastreams via the handle of the object.
+description = Islandora Handled Datastream Access allows view access to datastreams via the handle of the object.
 package = Islandora
 version = "7.x-1.x-dev"
 core = "7.x"

@@ -5,7 +5,7 @@
  * Access API.
  *
  *
- *  Copyright 2019 Leiden University Library
+ *  Copyright 2019-2020 Leiden University Library
  *
  *  This file is part of islandora_handled_datastream_access.
  *
@@ -30,8 +30,8 @@
  * Creates a JSON response that can have the following format:
  *  Access allowed -> Status: 200 OK, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => true }
  *  Access forbidden -> Status: 403 Forbidden, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Forbidden' }
- *  Object not found -> Status: 40$ Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Object not found' }
- *  Datastream not found -> Status: 40$ Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Datastream not found' }
+ *  Object not found -> Status: 404 Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Object not found' }
+ *  Datastream not found -> Status: 404 Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Datastream not found' }
  *
  * @param string $pid
  *   A pid of an (existing?) object.
