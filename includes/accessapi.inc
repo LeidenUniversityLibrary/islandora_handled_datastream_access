@@ -5,7 +5,7 @@
  * Access API.
  *
  *
- *  Copyright 2019 Leiden University Library
+ *  Copyright 2019-2020 Leiden University Library
  *
  *  This file is part of islandora_handled_datastream_access.
  *
@@ -30,8 +30,8 @@
  * Creates a JSON response that can have the following format:
  *  Access allowed -> Status: 200 OK, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => true }
  *  Access forbidden -> Status: 403 Forbidden, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Forbidden' }
- *  Object not found -> Status: 40$ Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Object not found' }
- *  Datastream not found -> Status: 40$ Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Datastream not found' }
+ *  Object not found -> Status: 404 Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Object not found' }
+ *  Datastream not found -> Status: 404 Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Datastream not found' }
  *
  * @param string $pid
  *   A pid of an (existing?) object.
@@ -44,6 +44,9 @@ function islandora_handled_datastream_access_json_access($handleprefix, $handles
   $pid = $object ? $object->id : NULL;
   $dsid = $object ? _islandora_handled_datastream_access_get_dsid($object, $neededdatastream) : NULL;
 
+  if (!isset($object)) {
+    _islandora_handled_datastream_access_json_response('404 Not Found', array('pid' => $pid, 'dsid' => $dsid, 'access' => FALSE, 'reason' => t('Object not found')));
+  }
   if (!isset($object[$dsid])) {
     _islandora_handled_datastream_access_json_response('404 Not Found', array('pid' => $pid, 'dsid' => $dsid, 'access' => FALSE, 'reason' => t('Datastream not found')));
   }
@@ -64,19 +67,23 @@ function islandora_handled_datastream_access_json_access($handleprefix, $handles
  * Helper function the determine the access of a specific thing.
  */
 function _islandora_handled_datastream_access_get_access($accessfunc, $op, $thing) {
-  // Impersonate an anonymous user:
   global $user;
-  $original_user = $user;
-  $old_state = drupal_save_session();
-  drupal_save_session(FALSE);
-  $user = drupal_anonymous_user();
-
+  $doimpersonate = FALSE;
+  // Impersonate an anonymous user:
+  if ($doimpersonate) {
+    $original_user = $user;
+    $old_state = drupal_save_session();
+    drupal_save_session(FALSE);
+    $user = drupal_anonymous_user();
+  }
   // Check the access.
   $canaccess = call_user_func($accessfunc, $op, $thing, $user);
 
   // Stop impersonating...
-  $user = $original_user;
-  drupal_save_session($old_state);
+  if ($doimpersonate) {
+    $user = $original_user;
+    drupal_save_session($old_state);
+  }
 
   return $canaccess;
 }

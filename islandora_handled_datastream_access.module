@@ -57,38 +57,40 @@ function islandora_handled_datastream_access_view($handleprefix, $handlesuffix, 
     $datastream = NULL;
     $dsid = _islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
     if ($dsid !== NULL && isset($object[$dsid])) {
-      if ($dsid === 'TN' && module_exists('islandora_imagecache') && module_load_include('inc', 'islandora_imagecache', 'includes/utilities')) {
+      if ($dsid === 'TN' && module_exists('islandora_imagecache')) {
+        module_load_include('inc', 'islandora_imagecache', 'includes/utilities');
         $tnurl = islandora_imagecache_retrieve_image_cache_image($object); 
         $defaultnurl = islandora_imagecache_retrieve_image_cache_image($object, 'X NO DS');
         if ($tnurl !== NULL && tnurl !== $defaultnurl) {
-          $thumbnaildata = file_get_contents($tnurl);
-          header('Content-type: ' . $datastream->mimetype);
-          header('Content-length: ' . strlen($thumbnaildata));
-          $cache_check = islandora_view_datastream_cache_check($datastream);
-          if ($cache_check !== 200) {
-            if ($cache_check === 304) {
-              header('HTTP/1.1 304 Not Modified');
+          $datastream = $object[$dsid];
+          $thumbnaildata = _islandora_handled_datastream_access_read_url_data($tnurl);
+          if ($thumbnaildata) {
+            header('Content-type: ' . $datastream->mimetype);
+            header('Content-length: ' . strlen($thumbnaildata));
+            $cache_check = islandora_view_datastream_cache_check($datastream);
+            if ($cache_check !== 200) {
+              if ($cache_check === 304) {
+                header('HTTP/1.1 304 Not Modified');
+              }
+              elseif ($cache_check === 412) {
+                header('HTTP/1.1 412 Precondition Failed');
+              }
             }
-            elseif ($cache_check === 412) {
-              header('HTTP/1.0 412 Precondition Failed');
+            islandora_view_datastream_set_cache_headers($datastream);
+  
+            drupal_page_is_cacheable(FALSE);
+           
+            if ($cache_check === 200) {
+              print $thumbnaildata;
             }
+            exit();
           }
-          islandora_view_datastream_set_cache_headers($datastream);
-
-          drupal_page_is_cacheable(FALSE);
-         
-          if ($cache_check === 200) {
-            print $thumbnaildata;
-          }
-          exit();
         }
       }
-      else {
-        $datastream = $object[$dsid];
-        if ($datastream !== NULL) {
-          islandora_view_datastream($datastream); 
-          exit();
-        }
+      $datastream = $object[$dsid];
+      if ($datastream !== NULL) {
+        islandora_view_datastream($datastream); 
+        exit();
       }
     }
   }
@@ -170,3 +172,26 @@ function _islandora_handled_datastream_access_get_dsid(AbstractObject $object, $
   return $dsid;
 }
  
+/**
+ * Helper function to read data from an url.
+ */
+function _islandora_handled_datastream_access_read_url_data($url) {
+  $data = NULL;
+  if (function_exists('curl_init')) {
+    // try to get remote file data using cURL
+    $cs = curl_init(); // curl session
+    curl_setopt($cs, CURLOPT_URL, $url);
+    curl_setopt($cs, CURLOPT_BINARYTRANSFER, true);
+    curl_setopt($cs, CURLOPT_FAILONERROR, true);
+    curl_setopt($cs, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($cs, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($cs, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($cs, CURLOPT_TIMEOUT, 30);
+    curl_setopt($cs, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($cs, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($cs, CURLOPT_USERAGENT, 'TCPDF');
+    $data = curl_exec($cs);
+    curl_close($cs);
+  }
+  return $data;
+}
