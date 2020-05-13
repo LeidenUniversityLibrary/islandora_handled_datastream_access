@@ -152,7 +152,6 @@ function _islandora_handled_datastream_access_get_dsid(AbstractObject $object, $
   $dsid = $neededdatastream;
   if ($neededdatastream === 'image') {
     $imagedatastreams = array(
-      'OBJ' => array('image/png', 'image/jpeg', 'image/jp2'),
       'JP2' => array('image/jp2'),
       'JPG' => array('image/jpeg'),
       'MEDIUM_SIZE' => array('image/png', 'image/jpeg'),
