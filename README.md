@@ -49,7 +49,7 @@ This module uses the following modules/libraries if they are installed:
 * [curl](https://github.com/curl) (is used when islandora_imagecache is installed, but by default installed with islandora)
 
 ## Installation
- 
+
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
 
 ## Maintainers/Sponsors
