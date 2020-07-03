@@ -32,27 +32,138 @@ function islandora_handled_datastream_access_menu() {
   $items = array();
   $items['islandora/handled_access/%/%/%/view'] = array(
     'title' => 'View datastream via handle',
-    'page callback' => 'islandora_handled_datastream_access_view',
+    'page callback' => 'islandora_handled_datastream_access_view_handle',
     'page arguments' => array(2, 3, 4),
     'type' => MENU_CALLBACK,
-    'access callback' => 'islandora_handled_datastream_access_view_access',
+    'access callback' => 'islandora_handled_datastream_access_view_handle_access',
     'access arguments' => array(2, 3, 4),
   );
   $items['islandora/handled_access/%/%/%/access'] = array(
-    'page callback' => 'islandora_handled_datastream_access_json_access',
+    'page callback' => 'islandora_handled_datastream_access_json_access_handle',
     'page arguments' => array(2, 3, 4),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
     'file' => 'includes/accessapi.inc',
   );
+  $items['access/%islandora_object/view'] = array(
+    'page callback' => 'islandora_handled_datastream_access_view_object',
+    'page arguments' => array(1, 'document'),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_object_access',
+    'access arguments' => array(1, 'document'),
+  );
+  $items['access/%islandora_object/access'] = array(
+    'page callback' => 'islandora_handled_datastream_access_json_access_object',
+    'page arguments' => array(1, 'document'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/accessapi.inc',
+  );
+  $items['access/%islandora_object/download'] = array(
+    'page callback' => 'islandora_handled_datastream_access_download_object',
+    'page arguments' => array(1, 'document'),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_object_access',
+    'access arguments' => array(1, 'document'),
+  );
+  $items['access/%islandora_object/thumbnail'] = array(
+    'page callback' => 'islandora_handled_datastream_access_view_object',
+    'page arguments' => array(1, 'thumbnail'),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_object_access',
+    'access arguments' => array(1, 'thumbnail'),
+  );
+  $items['access/%islandora_object/thumb'] = $items['access/%islandora_object/thumbnail'];
+  $items['access/%islandora_object/view/%'] = array(
+    'page callback' => 'islandora_handled_datastream_access_view_object',
+    'page arguments' => array(1, 3),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_object_access',
+    'access arguments' => array(1, 3),
+  );
+  $items['access/%islandora_object/access/%'] = array(
+    'page callback' => 'islandora_handled_datastream_access_json_access_object',
+    'page arguments' => array(1, 3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/accessapi.inc',
+  );
+  $items['access/%islandora_object/download/%'] = array(
+    'page callback' => 'islandora_handled_datastream_access_download_object',
+    'page arguments' => array(1, 3),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_object_access',
+    'access arguments' => array(1, 3),
+  );
+  $items['access/%/%/view'] = array(
+    'page callback' => 'islandora_handled_datastream_access_view_handle',
+    'page arguments' => array(1, 2, 'document'),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_handle_access',
+    'access arguments' => array(1, 2, 'document'),
+  );
+  $items['access/%/%/access'] = array(
+    'page callback' => 'islandora_handled_datastream_access_json_access_handle',
+    'page arguments' => array(1, 2, 'document'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/accessapi.inc',
+  );
+  $items['access/%/%/download'] = array(
+    'page callback' => 'islandora_handled_datastream_access_download_handle',
+    'page arguments' => array(1, 2, 'document'),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_handle_access',
+    'access arguments' => array(1, 2, 'document'),
+  );
+  $items['access/%/%/thumbnail'] = array(
+    'page callback' => 'islandora_handled_datastream_access_view_handle',
+    'page arguments' => array(1, 2, 'thumbnail'),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_handle_access',
+    'access arguments' => array(1, 2, 'thumbnail'),
+  );
+  $items['access/%/%/thumb'] = $items['access/%/%/thumbnail'];
+  $items['access/%/%/view/%'] = array(
+    'page callback' => 'islandora_handled_datastream_access_view_handle',
+    'page arguments' => array(1, 2, 4),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_handle_access',
+    'access arguments' => array(1, 2, 4),
+  );
+  $items['access/%/%/access/%'] = array(
+    'page callback' => 'islandora_handled_datastream_access_json_access_handle',
+    'page arguments' => array(1, 2, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/accessapi.inc',
+  );
+  $items['access/%/%/download/%'] = array(
+    'page callback' => 'islandora_handled_datastream_access_download_handle',
+    'page arguments' => array(1, 2, 4),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'islandora_handled_datastream_access_view_handle_access',
+    'access arguments' => array(1, 2, 4),
+  );
 
   return $items;
 }
 
-function islandora_handled_datastream_access_view($handleprefix, $handlesuffix, $neededdatastream) {
+/**
+ * Views an object datastream identified by its handle.
+ */
+function islandora_handled_datastream_access_view_handle($handleprefix, $handlesuffix, $neededdatastream) {
   module_load_include('inc', 'islandora', 'includes/datastream');
 
-  $object = _islandora_handled_datastream_access_object_load($handleprefix . '/' . $handlesuffix);
+  $object = islandora_handled_datastream_access_object_load_handle($handleprefix . '/' . $handlesuffix);
+
+  islandora_handled_datastream_access_view_object($object, $neededdatastream);
+}
+
+/**
+ * Helper function to view a datastream of an object.
+ */
+function islandora_handled_datastream_access_view_object($object, $neededdatastream) {
   if ($object !== NULL) { 
     $datastream = NULL;
     $dsid = _islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
@@ -97,8 +208,19 @@ function islandora_handled_datastream_access_view($handleprefix, $handlesuffix, 
   exit();
 }
 
-function islandora_handled_datastream_access_view_access($handleprefix, $handlesuffix, $neededdatastream) {
-  $object = _islandora_handled_datastream_access_object_load($handleprefix . '/' . $handlesuffix);
+/**
+ * Determines access to datastream of object identified by the handle.
+ */
+function islandora_handled_datastream_access_view_handle_access($handleprefix, $handlesuffix, $neededdatastream) {
+  $object = islandora_handled_datastream_access_object_load_handle($handleprefix . '/' . $handlesuffix);
+
+  return islandora_handled_datastream_access_view_object_access($object, $neededdatastream);
+}
+
+/**
+ * Helper function to determine access to datastream of object.
+ */
+function islandora_handled_datastream_access_view_object_access($object, $neededdatastream) {
   if ($object !== NULL) {
     $datastream = NULL;
     $dsid = _islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
@@ -120,11 +242,12 @@ function islandora_handled_datastream_access_view_access($handleprefix, $handles
  * @return mixed
  * The Islandora object associated with this handle or NULL.
  */
-function _islandora_handled_datastream_access_object_load($handle) {
+function islandora_handled_datastream_access_object_load_handle($handle) {
   // Why is this functionality not available in the islandora_handle module?
   module_load_include('inc', 'islandora_handle', 'includes/handle');
   $object = NULL;
   if (function_exists('islandora_handle_retrieve_selected_handler')) {
+    $handle = preg_replace('/^hdl:/', '', $handle);
     $handler_class = islandora_handle_retrieve_selected_handler();
     $handler = new $handler_class();
     $targeturl = $handler->readHandle($handle);
@@ -150,19 +273,41 @@ function _islandora_handled_datastream_access_object_load($handle) {
  */
 function _islandora_handled_datastream_access_get_dsid(AbstractObject $object, $neededdatastream) {
   $dsid = $neededdatastream;
-  if ($neededdatastream === 'image') {
-    $imagedatastreams = array(
-      'JP2' => array('image/jp2'),
-      'JPG' => array('image/jpeg'),
-      'MEDIUM_SIZE' => array('image/png', 'image/jpeg'),
+  $possibleds = array();
+  if ($neededdatastream === 'thumb' || $neededdatastream === 'thumbnail') {
+    $dsid = 'TN';
+  }
+  if ($neededdatastream === 'document') {
+    $possibleds += array(
+      'PDF' => array('*' => array('application/pdf')),
+      'PDFA' => array('*' => array('application/pdf')),
+      'OBJ' => array(
+        '*' => array('application/pdf', 'image/jp2', 'image/png', 'image/jpeg'),
+        'islandora:binaryObjectCModel' => '*',
+      ),
     );
-    foreach ($imagedatastreams as $adsid => $mimetypes) {
+  }
+  if ($neededdatastream === 'image') {
+    $possibleds += array(
+      'JP2' => array('*' => array('image/jp2')),
+      'JPG' => array('*' => array('image/jpeg')),
+      'MEDIUM_SIZE' => array('*' => array('image/png', 'image/jpeg')),
+    );
+  }
+  if (!empty($possibleds)) {
+    foreach ($possibleds as $adsid => $cmodel2mimetypes) {
       if (isset($object[$adsid])) {
         $datastream = $object[$adsid];
-        if (isset($datastream) && in_array($datastream->mimetype, $mimetypes, TRUE)) {
-          if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $datastream)) {
-            $dsid = $adsid;
-            break;
+        if (isset($datastream)) {
+          foreach ($cmodel2mimetypes as $cmodel => $mimetypes) {
+            if (($cmodel === '*') || in_array($cmodel, $object->models, TRUE)) {
+              if (($mimetypes === '*') || in_array($datastream->mimetype, $mimetypes, TRUE)) {
+                if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $datastream)) {
+                  $dsid = $adsid;
+                  break;
+                }
+              }
+            }
           }
         }
       }

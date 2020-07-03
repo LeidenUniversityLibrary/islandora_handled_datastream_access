@@ -25,7 +25,27 @@
 
 
 /**
- * Response in JSON about access for specific datastream of PID.
+ * Response in JSON about access for specific datastream of an object identified by a handle.
+ *
+ * See islandora_handled_datastream_access_json_access_object for specifics
+ *
+ * @param string $handleprefix
+ *   The handle prefix.
+ *
+ * @param string $handlesuffix
+ *   The handle suffix.
+ *
+ * @param string $dsid
+ *   A id of a (existing?) datastream.
+ */
+function islandora_handled_datastream_access_json_access_handle($handleprefix, $handlesuffix, $neededdatastream) {
+  $object = islandora_handled_datastream_access_object_load_handle($handleprefix . '/' . $handlesuffix);
+
+  islandora_handled_datastream_access_json_access_object($object, $neededdatastream);
+}
+
+/**
+ * Response in JSON about access for specific datastream of an object.
  *
  * Creates a JSON response that can have the following format:
  *  Access allowed -> Status: 200 OK, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => true }
@@ -33,14 +53,13 @@
  *  Object not found -> Status: 404 Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Object not found' }
  *  Datastream not found -> Status: 404 Not Found, content: { 'pid' => $pid, 'dsid' => $dsid, 'access' => false, 'reason' => 'Datastream not found' }
  *
- * @param string $pid
- *   A pid of an (existing?) object.
+ * @param $object
+ *   An object or NULL.
  *
  * @param string $dsid
  *   A id of a (existing?) datastream.
  */
-function islandora_handled_datastream_access_json_access($handleprefix, $handlesuffix, $neededdatastream) {
-  $object = _islandora_handled_datastream_access_object_load($handleprefix . '/' . $handlesuffix);
+function islandora_handled_datastream_access_json_access_object($object, $neededdatastream) {
   $pid = $object ? $object->id : NULL;
   $dsid = $object ? _islandora_handled_datastream_access_get_dsid($object, $neededdatastream) : NULL;
 
@@ -60,7 +79,6 @@ function islandora_handled_datastream_access_json_access($handleprefix, $handles
   else {
     _islandora_handled_datastream_access_json_response('403 Forbidden', array('pid' => $pid, 'dsid' => $dsid, 'access' => $canaccess, 'reason' => t('Forbidden')));
   }
-
 }
 
 /**
