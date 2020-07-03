@@ -12,11 +12,29 @@ This module adds the following URLs:
   With this URL a specific datastream can be viewed by using the handle, for example /islandora/handled_access/1887/12345/JPG/view
   will view the JPG datastream of the Islandora item with handle 1887/12345.
   If the TN datastream (thumbnail) is accessed and the islandora_imagecache is installed, the cached thumbnail will be used.
-  As a special case, the _what_ can be ```image```: an OBJ, JP2, JPG or MEDIUM_SIZE datastream (in that order) is then used if
+  As a special case, the _what_ can be ```image```: an JP2, JPG or MEDIUM_SIZE datastream (in that order) is then used if
   it exists, has an image mimetype (image/png, image/jpeg or image/jp2) and is accessible.
+  Also, _what_ can be ```document``` and then a document (PDF) or image or binary is returned.
+  Also, _what_ can be ```thumbnail``` and then the TN datastream is returned.
 * /islandora/handled_access/_handle_/_what_/access
   This URL returns a JSON response that indicates if an item and datastream can be found based on the handle and if access is
-  allowed. The special case _what_ is also possible.
+  allowed. The special cases _what_ are also possible.
+* /access/_handle_/view
+  This does the same as /islandora/handled_access/_handle_/_what_/view for _what_ = ```document```
+* /access/_handle_/access
+  This does the same as /islandora/handled_access/_handle_/_what_/access for _what_ = ```document```
+* /access/_handle_/download
+  This does the same as /islandora/handled_access/_handle_/_what_/view for _what_ = ```document``` but downloads the document
+* /access/_handle_/thumbnail
+  This does the same as /islandora/handled_access/_handle_/_what_/view for _what_ = ```thumbnail```
+* /access/_PID_/view
+  Same as /access/_handle_/view but with a PID of an object.
+* /access/_PID_/access
+  Same as /access/_handle_/access but with a PID of an object.
+* /access/_PID_/download
+  Same as /access/_handle_/download but with a PID of an object.
+* /access/_PID_/thumbnail
+  Same as /access/_handle_/thumbnail but with a PID of an object.
 
 ## Requirements
 
