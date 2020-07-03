@@ -305,7 +305,7 @@ function islandora_handled_datastream_access_get_dsid(AbstractObject $object, $n
               if (($mimetypes === '*') || in_array($datastream->mimetype, $mimetypes, TRUE)) {
                 if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $datastream)) {
                   $dsid = $adsid;
-                  break;
+                  break 2;
                 }
               }
             }
