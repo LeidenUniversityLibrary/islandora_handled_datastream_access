@@ -164,6 +164,7 @@ function islandora_handled_datastream_access_view_handle($handleprefix, $handles
  * Helper function to view a datastream of an object.
  */
 function islandora_handled_datastream_access_view_object($object, $neededdatastream) {
+  module_load_include('inc', 'islandora', 'includes/datastream');
   if ($object !== NULL) {
     $datastream = NULL;
     $dsid = islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
@@ -172,7 +173,7 @@ function islandora_handled_datastream_access_view_object($object, $neededdatastr
         module_load_include('inc', 'islandora_imagecache', 'includes/utilities');
         $tnurl = islandora_imagecache_retrieve_image_cache_image($object);
         $defaultnurl = islandora_imagecache_retrieve_image_cache_image($object, 'X NO DS');
-        if ($tnurl !== NULL && tnurl !== $defaultnurl) {
+        if ($tnurl !== NULL && $tnurl !== $defaultnurl) {
           $datastream = $object[$dsid];
           $thumbnaildata = _islandora_handled_datastream_access_read_url_data($tnurl);
           if ($thumbnaildata) {
