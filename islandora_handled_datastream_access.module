@@ -166,7 +166,7 @@ function islandora_handled_datastream_access_view_handle($handleprefix, $handles
 function islandora_handled_datastream_access_view_object($object, $neededdatastream) {
   if ($object !== NULL) { 
     $datastream = NULL;
-    $dsid = _islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
+    $dsid = islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
     if ($dsid !== NULL && isset($object[$dsid])) {
       if ($dsid === 'TN' && module_exists('islandora_imagecache')) {
         module_load_include('inc', 'islandora_imagecache', 'includes/utilities');
@@ -223,7 +223,7 @@ function islandora_handled_datastream_access_view_handle_access($handleprefix, $
 function islandora_handled_datastream_access_view_object_access($object, $neededdatastream) {
   if ($object !== NULL) {
     $datastream = NULL;
-    $dsid = _islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
+    $dsid = islandora_handled_datastream_access_get_dsid($object, $neededdatastream);
     if ($dsid !== NULL && isset($object[$dsid])) {
       $datastream = $object[$dsid];
       if ($datastream !== NULL) {
@@ -271,7 +271,7 @@ function islandora_handled_datastream_access_object_load_handle($handle) {
  * @return string
  * The datastream id to use, or null if not found.
  */
-function _islandora_handled_datastream_access_get_dsid(AbstractObject $object, $neededdatastream) {
+function islandora_handled_datastream_access_get_dsid(AbstractObject $object, $neededdatastream) {
   $dsid = $neededdatastream;
   $possibleds = array();
   if ($neededdatastream === 'thumb' || $neededdatastream === 'thumbnail') {

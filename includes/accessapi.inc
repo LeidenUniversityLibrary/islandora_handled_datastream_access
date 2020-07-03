@@ -61,7 +61,7 @@ function islandora_handled_datastream_access_json_access_handle($handleprefix, $
  */
 function islandora_handled_datastream_access_json_access_object($object, $neededdatastream) {
   $pid = $object ? $object->id : NULL;
-  $dsid = $object ? _islandora_handled_datastream_access_get_dsid($object, $neededdatastream) : NULL;
+  $dsid = $object ? islandora_handled_datastream_access_get_dsid($object, $neededdatastream) : NULL;
 
   if (!isset($object)) {
     _islandora_handled_datastream_access_json_response('404 Not Found', array('pid' => $pid, 'dsid' => $dsid, 'access' => FALSE, 'reason' => t('Object not found')));
