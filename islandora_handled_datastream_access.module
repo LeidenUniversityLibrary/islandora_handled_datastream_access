@@ -254,10 +254,17 @@ function islandora_handled_datastream_access_object_load_handle($handle) {
     $targeturl = $handler->readHandle($handle);
     if ($targeturl) {
       $urlparts = parse_url($targeturl);
-      $posaliaspath = ltrim($urlparts['path'], '/');
-      $normalpath = drupal_get_normal_path(urldecode($posaliaspath));
-      $normalpath = ltrim($normalpath, '/');
-      $object = menu_get_object('islandora_object', 2, $normalpath);
+      if ($urlparts['host'] === 'catalogue.leidenuniv.nl') {
+        list($prefix, $suffix) = explode('/', $handle, 2);
+        $pid = (strpos($suffix, 'item:') === 0) ? $suffix : "item:$suffix";
+        $object = islandora_object_load($pid);
+      }
+      else {
+        $posaliaspath = ltrim($urlparts['path'], '/');
+        $normalpath = drupal_get_normal_path(urldecode($posaliaspath));
+        $normalpath = ltrim($normalpath, '/');
+        $object = menu_get_object('islandora_object', 2, $normalpath);
+      }
     }
   }
   return $object;
@@ -286,6 +293,7 @@ function islandora_handled_datastream_access_get_dsid(AbstractObject $object, $n
         '*' => array('application/pdf', 'image/jp2', 'image/png', 'image/jpeg'),
         'islandora:binaryObjectCModel' => '*',
       ),
+      'JP2' => array('*' => array('image/jp2')),
     );
   }
   if ($neededdatastream === 'image') {
